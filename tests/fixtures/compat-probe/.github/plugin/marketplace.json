@@ -1,0 +1,8 @@
+{
+  "name": "compat-market",
+  "owner": { "name": "foundation spike" },
+  "metadata": { "description": "Local marketplace for the compat probe", "version": "0.0.1" },
+  "plugins": [
+    { "name": "compat-plugin", "description": "Synthetic probe plugin", "version": "0.0.1", "source": "./compat-plugin" }
+  ]
+}

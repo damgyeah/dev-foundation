@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "powershell": "Set-Content -Path $env:PROBE_OUT -Value (Get-Date -Format o); Write-Output '{\"additionalContext\":\"HOOK-CANARY-6021: the session-start hook from compat-plugin ran.\"}'",
+        "bash": "date > \"$PROBE_OUT\"; echo '{\"additionalContext\":\"HOOK-CANARY-6021: the session-start hook from compat-plugin ran.\"}'",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
