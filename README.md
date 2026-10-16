@@ -7,6 +7,10 @@ Our shared engineering foundation for coding agents, in two parts:
 
 ## Adopt in a repository
 
+Adopt the core in new repositories and in ones without strong agent instructions of their own. A
+repository that already has a detailed `AGENTS.md`, skills and enforced checks gains little from
+it; see [what the pilots found](docs/pilot-results.md).
+
 In a pull request, from the repository root:
 
 ```sh
