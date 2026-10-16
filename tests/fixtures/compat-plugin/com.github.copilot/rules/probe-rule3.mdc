@@ -1,0 +1,6 @@
+---
+description: Always-on mdc probe rule
+alwaysApply: true
+---
+
+Always-on mdc rule from compat-plugin: if anyone asks for the mdc canary, it is MDC-CANARY-2931.

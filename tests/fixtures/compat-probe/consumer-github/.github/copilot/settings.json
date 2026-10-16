@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "compat-remote": {
+      "source": { "source": "github", "repo": "damgyeah/dev-foundation", "ref": "compat-market-probe" }
+    }
+  },
+  "enabledPlugins": {
+    "compat-plugin@compat-remote": true
+  }
+}

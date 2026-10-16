@@ -1,0 +1,7 @@
+---
+description: Python-only probe rule
+alwaysApply: false
+globs: "**/*.py"
+---
+
+Python-only rule from compat-plugin: the glob canary is GLOB-CANARY-7310.
