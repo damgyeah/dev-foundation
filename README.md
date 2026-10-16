@@ -23,10 +23,11 @@ Then add one line to its `AGENTS.md`, so people and agents know it is there:
 Nontrivial work follows the `foundation-mode` skill from the foundation plugin. This file wins where they differ.
 ```
 
-Two conditions apply, both measured in [docs/copilot-compat.md](docs/copilot-compat.md):
+Three conditions apply, all measured in [docs/copilot-compat.md](docs/copilot-compat.md):
 
 - Copilot loads a repository-enabled plugin only in a trusted folder. Trust the folder when Copilot asks.
 - dev-foundation is private, so Copilot fetches it with `git clone`. Your `git` must already be able to clone it: Git Credential Manager does this, or run `gh auth setup-git`.
+- Each person opens one interactive `copilot` session in the repository first. That session installs the plugin. `copilot -p` and automation see it only after that.
 
 To install it for yourself instead, run `copilot plugin marketplace add damgyeah/dev-foundation`, then `copilot plugin install foundation@dev-foundation`.
 

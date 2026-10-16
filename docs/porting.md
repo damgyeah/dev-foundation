@@ -30,7 +30,7 @@ This is the one page, besides provenance, that may name the upstream's Cursor-sp
 
 - Router: `poteto-mode` became `foundation-mode`, rewritten to under 10 KB.
 - Playbooks: investigation, bug-fix, feature, refactoring, prototype, opening-a-pr, session-pickup, pause-safely. Bug fix now runs the regression check red before implementing, and commits the test and the fix together.
-- Skills: how, why (git and GitHub sources only), architect, interrogate (with its rubric, lead judgment, and code-quality lens), blast-radius, tdd, correct, reflect, unslop, technical-writing, no-comments, benchmark-checklist, show-me-your-work.
+- Skills: how, why (only the source-control playbook is kept; other sources available in the session still get a generic investigator), architect, interrogate (with its rubric, lead judgment, and code-quality lens), blast-radius, tdd, correct, reflect, unslop, technical-writing, no-comments, benchmark-checklist, show-me-your-work.
 - All 24 `principle-*` skills. Six whose upstream bodies were cut to a line or two were rewritten from the router's summaries.
 
 ## What was deferred
@@ -43,7 +43,7 @@ Listed so a later version can pick them up. Each has its reason in provenance.
 - Every script: the Bun and TypeScript tooling under `poteto-mode/scripts/` and `show-me-your-work/scripts/log.sh`. No Bun.
 - The bugbot-triage reference, which belongs with babysit.
 
-Dropped outright: the Cursor plugin manifest, the logo and guide images, the user guide (`docs/guide/`, replaced by the README), and the why sources for Databricks, Datadog, Linear, Notion, Sentry, Slack, and incident postmortems (why keeps one generic investigator per available source).
+Dropped outright: the Cursor plugin manifest, the logo and guide images, the user guide (`docs/guide/`, replaced by the README), and the why sources for Databricks, Datadog, Linear, Notion, Sentry, Slack, and incident postmortems. why still searches any such source the session can reach, through a generic investigator.
 
 ## Staying current
 
