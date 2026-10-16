@@ -1,0 +1,31 @@
+name: core-check
+
+# Called from an adopting repository; fails when its AGENTS.md core block is missing, hand-edited or stale.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: The dev-foundation tag the repository pins, the same one as in `uses:`
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  core-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: damgyeah/dev-foundation
+          ref: ${{ inputs.ref }}
+          path: .dev-foundation
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: node .dev-foundation/scripts/foundation.mjs check

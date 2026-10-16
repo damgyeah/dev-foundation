@@ -1,6 +1,44 @@
 # dev-foundation
 
-Our shared engineering foundation for GitHub Copilot: one plugin, `foundation`, with the playbooks, skills, and principles every repository we own switches on. It routes nontrivial work through a playbook (reproduce the bug, design before coding, prove it works), and it defers to each repository's own rules.
+Our shared engineering foundation for coding agents, in two parts:
+
+- **The core** ([core/AGENTS.core.md](core/AGENTS.core.md)): a short set of rules that lives in each repository's own `AGENTS.md`, kept in sync from here by a tool, with a CI check that fails when it is missing, hand-edited or stale.
+- **The plugin** (`foundation`, optional): playbooks, skills and principles for depth.
+
+## Adopt in a repository
+
+In a pull request, from the repository root:
+
+```sh
+npx --yes github:damgyeah/dev-foundation#v0.2.0 sync
+```
+
+`sync` writes the core between `<!-- foundation:core … begin -->` and `<!-- foundation:core end -->` markers in `AGENTS.md`, creating the file or appending the block if needed. Every byte outside the markers stays as it was, line endings included. Then add `.github/workflows/foundation.yml`:
+
+```yaml
+name: foundation
+on: pull_request
+jobs:
+  core:
+    uses: damgyeah/dev-foundation/.github/workflows/core-check.yml@v0.2.0
+    with: { ref: v0.2.0 }
+```
+
+Write the same tag in both places. Release tags here are immutable, so a tag pin cannot move under you.
+
+To update, bump the tag in that workflow, run `sync` with the new tag, and open a PR.
+
+`check` (run it locally the same way) fails with one of:
+
+| Code | Meaning | Fix |
+|---|---|---|
+| `FOUNDATION_CORE_MISSING` | No core block in `AGENTS.md` | Run `sync` |
+| `FOUNDATION_CORE_EDITED` | The block was edited by hand, or its markers are broken | Change the core here instead, then run `sync` (fix broken markers by hand first) |
+| `FOUNDATION_CORE_STALE` | The block is from another tag than the one the workflow pins | Run `sync` with the pinned tag |
+
+Use `--file <path>` for a file other than `AGENTS.md`.
+
+## The plugin
 
 Adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, Lauren Tan) for the GitHub Copilot app and CLI running Claude Opus. [docs/porting.md](docs/porting.md) says what changed and why. [provenance/pstack.json](provenance/pstack.json) records every upstream file taken, from which commit.
 
@@ -58,6 +96,8 @@ The repository's `AGENTS.md`, `CONTRIBUTING.md`, PR template, and skills win ove
 ## Work on it
 
 ```text
+core/AGENTS.core.md             the core; scripts/foundation.mjs syncs and checks it
+.github/workflows/core-check.yml the reusable check adopting repositories call
 plugin/                         the plugin; the whole folder is copied on install
   plugin.json
   skills/<name>/SKILL.md        foundation-mode and its playbooks, 13 skills, 24 principles
@@ -67,7 +107,9 @@ plugin/                         the plugin; the whole folder is copied on instal
 docs/ provenance/ scripts/ tests/
 ```
 
-`npm test` runs the lint (`scripts/lint.mjs`) over the repository, then the lint's own tests. It needs Node 22 or later and nothing else. The lint fails with a stable code for broken links, unknown skill or agent references, frontmatter Copilot does not read, an oversized or malformed rule, a bad marketplace entry, upstream terms that must not survive the port, and incomplete provenance.
+`npm test` runs the lint (`scripts/lint.mjs`) over the repository, then the tests of the lint and of `scripts/foundation.mjs`. It needs Node 22 or later and nothing else. The lint fails with a stable code for broken links, unknown skill or agent references, frontmatter Copilot does not read, an oversized or malformed rule, a bad marketplace entry, upstream terms that must not survive the port, and incomplete provenance.
+
+To release, bump `version` in `package.json`, run `node scripts/foundation.mjs sync` so this repository's own `AGENTS.md` carries the new core, merge, then tag `v<version>` on that commit. `core-check` in `validate.yml` fails until `AGENTS.md` matches.
 
 Try a change in an isolated Copilot home, never your real one:
 
