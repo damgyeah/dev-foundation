@@ -90,6 +90,8 @@ test('a plugin agent needs a name matching its file and a description, and refer
   assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('Helper') })), ['AGENT_NAME_MISMATCH']);
   assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper', '') })), ['AGENT_DESCRIPTION_MISSING']);
   assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'docs/a.md': '`agent_type: "foundation:other"`\n' })), ['AGENT_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'plugin/skills/x.md': 'Delegate to a `foundation:other` subagent.\n' })), ['AGENT_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'plugin/skills/x.md': 'Delegate to a `foundation:helper` subagent, see `http:x`.\n', 'docs/b.md': 'For example `foundation:reviewer`.\n' })), []);
 });
 
 test('a hidden skill must be linked, not named in bold', () => {
@@ -186,7 +188,9 @@ test('a rule must be an always-applied .mdc within budget that names real skills
   assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: false') })), ['RULE_NOT_ALWAYS_APPLY']);
   assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true\napplyTo: "**"') })), ['RULE_FRONTMATTER_KEY_UNKNOWN']);
   assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'x'.repeat(2100)) })), ['RULE_TOO_LARGE']);
-  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Load `who` first.\n') })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Load the `who` skill first.\n') })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Skills: `why` (motivation).\n') })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Spawn with the `task` tool. Use `how` (code).\n') })), []);
 });
 
 test('marketplace entries must point at a plugin of the same name', () => {

@@ -208,7 +208,9 @@ export function lint(root) {
     if (!file.endsWith('.md')) continue;
     proseLines(text).forEach((line, i) => {
       // Plugin agents load as `<plugin>:<file stem>`.
-      for (const m of line.matchAll(/agent_type: "([a-z0-9-]+):([a-z0-9-]+)"/g)) {
+      const agentRefs = [...line.matchAll(/agent_type: "([a-z0-9-]+):([a-z0-9-]+)"/g), ...line.matchAll(/`([a-z0-9-]+):([a-z0-9-]+)`/g)];
+      for (const m of agentRefs) {
+        if (m[0].startsWith('`') && (m[1] !== plugin || !file.startsWith('plugin/'))) continue;
         if (m[1] !== plugin || !agents.has(m[2])) fail('AGENT_REF_UNKNOWN', file, i + 1, `agent "${m[1]}:${m[2]}" does not exist`);
       }
       for (const target of linkTargets(line)) {
@@ -246,9 +248,9 @@ function lintRule(file, text, skills, fail) {
   if (fm.alwaysApply !== 'true') fail('RULE_NOT_ALWAYS_APPLY', file, 1, 'alwaysApply must be true');
   const bytes = Buffer.byteLength(text);
   if (bytes > MAX_RULE_BYTES) fail('RULE_TOO_LARGE', file, 1, `${bytes} bytes, budget ${MAX_RULE_BYTES}`);
-  // Every backticked kebab-case name in a rule is a skill the model is told to load.
+  // A skill reference in a rule is a backticked name followed by " skill" or a parenthesized trigger.
   text.split(/\r?\n/).forEach((line, i) => {
-    for (const m of line.matchAll(/`([a-z][a-z0-9]*(?:-[a-z0-9]+)*)`/g)) {
+    for (const m of line.matchAll(/`([a-z][a-z0-9]*(?:-[a-z0-9]+)*)`(?= skill\b| \()/g)) {
       if (!skills.has(m[1])) fail('SKILL_REF_UNKNOWN', file, i + 1, `skill "${m[1]}" does not exist`);
     }
   });
