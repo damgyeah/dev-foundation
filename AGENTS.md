@@ -2,7 +2,7 @@
 
 Rules for changing dev-foundation. The block below is this repository's own copy of the core it ships. After changing `core/AGENTS.core.md` or the version, run `node scripts/foundation.mjs sync`; CI checks it.
 
-<!-- foundation:core v0.2.0 a7b433e8eea847bfd70494a38c289af8a587146af575f9302982af4b772918d3 begin -->
+<!-- foundation:core v0.3.0 a7b433e8eea847bfd70494a38c289af8a587146af575f9302982af4b772918d3 begin -->
 ## Foundation core
 
 Engineering rules shared by our repositories, synced from

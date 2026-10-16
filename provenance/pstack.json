@@ -485,8 +485,8 @@
     {
       "path": "skills/poteto-mode/playbooks/multi-phase-plan.md",
       "sha256": "5f239457bfdec3345c92caa06c59bf0257c662b89353f25a1c02ea942dcd00b1",
-      "status": "deferred",
-      "reason": "Deferred from the slim first version."
+      "status": "adapted",
+      "target": "plugin/skills/foundation-mode/playbooks/multi-phase-plan.md"
     },
     {
       "path": "skills/poteto-mode/playbooks/opening-a-pr.md",
@@ -582,7 +582,7 @@
       "path": "skills/poteto-mode/scripts/check-plan.mjs",
       "sha256": "e58c3d871b09d477be00628d69dd23ffa6c2e3a1728f5b867a841baa8e90278b",
       "status": "deferred",
-      "reason": "Upstream scripts (Bun/TypeScript/shell); no scripts ship in the first version."
+      "reason": "Validates the ten-lane swarm plan template, which foundation does not use; multi-phase-plan checks its own plan structure inline (step 7)."
     },
     {
       "path": "skills/poteto-mode/scripts/check-plan.test.ts",

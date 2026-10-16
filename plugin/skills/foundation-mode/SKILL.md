@@ -1,6 +1,6 @@
 ---
 name: foundation-mode
-description: "Engineering workflow for nontrivial work in a repository: route the task to a playbook (investigation, bug fix, feature, refactoring, prototype, opening a PR, session pickup, pause safely), apply the principles that shape each decision, delegate to subagents, and prove the result before reporting. Use it first for any nontrivial task (a bug, a feature, a refactor, a design or how-and-why question, picking up or pausing work), when asked for foundation mode, or for /foundation:foundation-mode."
+description: "Engineering workflow for nontrivial work in a repository: route the task to a playbook (investigation, bug fix, feature, refactoring, prototype, multi-phase plan, opening a PR, session pickup, pause safely), apply the principles that shape each decision, delegate to subagents, and prove the result before reporting. Use it first for any nontrivial task (a bug, a feature, a refactor, a design or how-and-why question, picking up or pausing work), when asked for foundation mode, or for /foundation:foundation-mode."
 ---
 
 # Foundation mode
@@ -22,9 +22,10 @@ Match the task to one playbook and open a todo list whose first items are its st
 - [Prototype](playbooks/prototype.md). A throwaway sketch that settles a design or an empirical question by observing it.
 - [Session pickup](playbooks/session-pickup.md). Resuming another agent's or session's in-flight work.
 - [Pause safely](playbooks/pause-safely.md). Stopping cleanly so the work can resume, on request or before compaction.
+- [Multi-phase plan](playbooks/multi-phase-plan.md). A program of several PRs, such as a migration, run by a coordinator with background workers.
 - [Opening a PR](playbooks/opening-a-pr.md). The last step of every playbook that changes code.
 
-When nothing fits (a large migration, a multi-day program, an overnight run), say so, write a short plan in the same shape (numbered steps that each end in a check), and follow it.
+When nothing fits (an overnight run, a one-off chore), say so, write a short plan in the same shape (numbered steps that each end in a check), and follow it.
 
 ## Triggers
 
