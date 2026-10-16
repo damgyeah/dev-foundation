@@ -31,7 +31,8 @@ test('the repository itself is clean', () => {
 
 test('a well-formed skill tree passes', () => {
   const root = tree({
-    'plugin/skills/how/SKILL.md': skill('how', 'Explains code.', 'See [why](../why/SKILL.md) and the **why** skill, `/why`, principle-fix-root-causes.\n'),
+    'plugin/plugin.json': '{ "name": "foundation" }',
+    'plugin/skills/how/SKILL.md': skill('how', 'Explains code.', 'See [why](../why/SKILL.md) and the **why** skill, `/foundation:why`, principle-fix-root-causes.\n'),
     'plugin/skills/why/SKILL.md': skill('why', '>-\n  Folded\n  description.'),
     'plugin/skills/principle-fix-root-causes/SKILL.md': skill('principle-fix-root-causes'),
   });
@@ -69,6 +70,22 @@ test('an unknown skill reference fails', () => {
   assert.deepEqual(codes(tree({ 'docs/a.md': 'Run `/missing`.\n' })), ['SKILL_REF_UNKNOWN']);
   assert.deepEqual(codes(tree({ 'docs/a.md': 'Read principle-missing first.\n' })), ['SKILL_REF_UNKNOWN']);
   assert.deepEqual(codes(tree({ 'docs/a.md': 'Run `/plan`, `/init` then `/add-dir`.\n' })), []);
+});
+
+test('a skill command must carry the plugin namespace', () => {
+  const files = { 'plugin/plugin.json': '{ "name": "foundation" }', 'plugin/skills/how/SKILL.md': skill('how') };
+  assert.deepEqual(lint(tree({ ...files, 'docs/a.md': 'Run `/how`.\n' })).map((f) => [f.code, f.message]), [
+    ['SKILL_REF_UNNAMESPACED', 'write `/foundation:how`; `/how` does not resolve'],
+  ]);
+  assert.deepEqual(codes(tree({ ...files, 'docs/a.md': 'Run `/other:how`.\n' })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...files, 'docs/a.md': 'Run `/foundation:what`.\n' })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...files, 'docs/a.md': 'Run `/foundation:how`.\n' })), []);
+});
+
+test('a hidden skill must be linked, not named in bold', () => {
+  const hidden = '---\nname: how\ndescription: Explains.\ndisable-model-invocation: true\n---\n';
+  assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use the **how** skill.\n' })), ['SKILL_REF_HIDDEN']);
+  assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use [how](../plugin/skills/how/SKILL.md).\n' })), []);
 });
 
 test('banned terms fail anywhere except the allowlist', () => {

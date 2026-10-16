@@ -105,12 +105,29 @@ function linkTargets(line) {
   return targets;
 }
 
+// A slash command for a plugin skill is namespaced (`/foundation:how`); the bare `/how` does not resolve.
+// A skill with `disable-model-invocation: true` is hidden from the model, so prose must link to its file.
 function skillRefs(line) {
   const refs = [];
-  for (const m of line.matchAll(/`\/([a-z0-9][a-z0-9-]*)`/g)) if (!BUILTIN_COMMANDS.has(m[1])) refs.push(m[1]);
-  for (const m of line.matchAll(/\*\*([a-z0-9][a-z0-9-]*)\*\* skill/g)) refs.push(m[1]);
-  for (const m of line.matchAll(/\bprinciple-[a-z0-9-]*[a-z0-9]/g)) refs.push(m[0]);
+  for (const m of line.matchAll(/`\/(?:([a-z0-9-]+):)?([a-z0-9][a-z0-9-]*)`/g)) {
+    if (m[1]) refs.push({ name: m[2], kind: 'namespaced', plugin: m[1] });
+    else if (!BUILTIN_COMMANDS.has(m[2])) refs.push({ name: m[2], kind: 'slash' });
+  }
+  for (const m of line.matchAll(/\*\*([a-z0-9][a-z0-9-]*)\*\* skill/g)) refs.push({ name: m[1], kind: 'bold' });
+  for (const m of line.matchAll(/\bprinciple-[a-z0-9-]*[a-z0-9]/g)) refs.push({ name: m[0], kind: 'token' });
   return refs;
+}
+
+function checkRef(ref, skills, plugin) {
+  if (ref.kind === 'namespaced' && ref.plugin !== plugin) {
+    return ['SKILL_REF_UNKNOWN', `plugin "${ref.plugin}" is not this plugin ("${plugin ?? 'none'}")`];
+  }
+  if (!skills.has(ref.name)) return ['SKILL_REF_UNKNOWN', `skill "${ref.name}" does not exist`];
+  if (ref.kind === 'slash') return ['SKILL_REF_UNNAMESPACED', `write \`/${plugin}:${ref.name}\`; \`/${ref.name}\` does not resolve`];
+  if (ref.kind === 'bold' && skills.get(ref.name).hidden) {
+    return ['SKILL_REF_HIDDEN', `"${ref.name}" is hidden from the model; link to its SKILL.md instead`];
+  }
+  return null;
 }
 
 export function lint(root) {
@@ -118,7 +135,15 @@ export function lint(root) {
   const failures = [];
   const fail = (code, file, line, message) => failures.push({ code, file, line, message });
   const files = walk(root);
-  const skills = new Set(files.map((f) => SKILL_FILE.exec(f)?.[1]).filter(Boolean));
+  const skills = new Map();
+  for (const file of files) {
+    const dir = SKILL_FILE.exec(file)?.[1];
+    if (!dir) continue;
+    const fm = parseFrontmatter(readFileSync(join(root, file), 'utf8'));
+    skills.set(dir, { hidden: fm?.['disable-model-invocation'] === 'true' });
+  }
+  const manifest = join(root, 'plugin', 'plugin.json');
+  const plugin = existsSync(manifest) ? JSON.parse(readFileSync(manifest, 'utf8')).name : undefined;
 
   for (const file of files) {
     const text = readFileSync(join(root, file), 'utf8');
@@ -160,7 +185,8 @@ export function lint(root) {
         if (!existsSync(abs)) fail('LINK_BROKEN', file, i + 1, `link target "${target}" does not exist`);
       }
       for (const ref of skillRefs(line)) {
-        if (!skills.has(ref)) fail('SKILL_REF_UNKNOWN', file, i + 1, `skill "${ref}" does not exist`);
+        const problem = checkRef(ref, skills, plugin);
+        if (problem) fail(problem[0], file, i + 1, problem[1]);
       }
     });
   }
