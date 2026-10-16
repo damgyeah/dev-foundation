@@ -22,9 +22,9 @@ context is the evidence that the file loaded.
 
 | # | Question | Answer |
 |---|---|---|
-| Q1 | `skills/` discovered after `copilot plugin install <path>`? | **Yes.** Skill names are **not** namespaced for the model (`probe-alpha`), but slash commands **are** (`/compat-plugin:probe-alpha`). A local-path install is **copied** to `$COPILOT_HOME/installed-plugins/_direct/<plugin>/`. Relative links between skills resolve against that copy. |
+| Q1 | `skills/` discovered after `copilot plugin install <path>`? | **Yes.** Skill names are **not** namespaced for the model (`probe-alpha`), but slash commands **are** (/`compat-plugin:probe-alpha`). A local-path install is **copied** to `$COPILOT_HOME/installed-plugins/_direct/<plugin>/`. Relative links between skills resolve against that copy. |
 | Q2 | `com.github.copilot/agents/*.agent.md`? | **Loads**, as `compat-plugin:probe-agent`. `model:` and `tools:` take effect; `description` is shown. The `task` tool spawns it only by the namespaced name. A top-level `agents/` folder is **ignored**. |
-| Q3 | `disable-model-invocation: true`? | **Honored.** The skill is hidden from the model (not listed, `skill` tool returns `Skill not found`) and **still runs** as `/compat-plugin:probe-beta args`. `user-invocable: false` is honored too (no slash command; the model can still use it). |
+| Q3 | `disable-model-invocation: true`? | **Honored.** The skill is hidden from the model (not listed, `skill` tool returns `Skill not found`) and **still runs** as /`compat-plugin:probe-beta args`. `user-invocable: false` is honored too (no slash command; the model can still use it). |
 | Q4 | Repo `.github/copilot/settings.json` with `extraKnownMarketplaces` + `enabledPlugins`? | **Works, only in a trusted folder**, scoped to that repo. A `directory` marketplace loads live, even under `copilot -p` (contrary to github/copilot-cli#4507). A `github` marketplace is **installed only by the first interactive session** in the repo; after that `-p` loads it too. ACP sessions loaded only the agent. |
 | Q5 | What makes a repo a marketplace; private repos? | `.github/plugin/marketplace.json` at the repo root, plugin `source` relative to the repo root (`./tests/fixtures/compat-plugin` worked from a GitHub repo). A **private** repo works when `git` itself can authenticate to github.com (`gh auth setup-git` or Git Credential Manager); `COPILOT_GITHUB_TOKEN` alone failed. |
 | Q6 | Plugin `com.github.copilot/hooks/hooks.json`? | **Loads and runs.** A `sessionStart` hook's `additionalContext` reaches the model, at the start of the first user message. |
@@ -60,7 +60,10 @@ The **slash commands** a person sees are namespaced by plugin (ACP
 COMMANDS: add-dir, allow-all, ..., usage, compat-plugin:probe-alpha, compat-plugin:probe-beta
 ```
 
-So `/probe-beta` does **not** resolve; `/compat-plugin:probe-beta` does.
+So /`probe-beta` does **not** resolve; /`compat-plugin:probe-beta` does. (In this doc the
+slash sits outside the backticks for commands of plugins other than this repo's, so
+`npm run lint`, which checks every namespaced slash reference against this repo's plugin,
+leaves them alone.)
 
 **Cache.** A local-path install is a copy, not a link:
 `$COPILOT_HOME\installed-plugins\_direct\compat-plugin\` holds `plugin.json`, `skills/`,
@@ -273,15 +276,16 @@ GitHub token" work without a git credential helper.
 
 ### Recommended layout for dev-foundation
 
-One repo that is both the marketplace and the plugin source, plugin under `plugin/`:
+One repo that is both the marketplace and the plugin source, plugin under `plugin/` (as on
+`main`, where the plugin is named `foundation`):
 
 ```text
 dev-foundation/
   .github/plugin/marketplace.json      # the marketplace (name: dev-foundation)
   plugin/                              # the plugin root
-    plugin.json                        # $schema agent-plugins 1.0.0, name: dev-foundation
+    plugin.json                        # $schema agent-plugins 1.0.0, name: foundation
     skills/<skill>/SKILL.md            # skills, portable (Copilot and Claude Code)
-    com.github.copilot/agents/<id>.agent.md   # Copilot agents -> dev-foundation:<id>
+    com.github.copilot/agents/<id>.agent.md   # Copilot agents -> foundation:<id>
     com.github.copilot/rules/<name>.mdc       # always-on instructions (Q7)
     com.github.copilot/hooks/hooks.json       # optional (Q6)
   docs/  tests/  provenance/           # outside plugin/: never installed
@@ -294,7 +298,7 @@ dev-foundation/
   "name": "dev-foundation",
   "owner": { "name": "damgyeah" },
   "plugins": [
-    { "name": "dev-foundation", "description": "Shared engineering foundation", "source": "./plugin" }
+    { "name": "foundation", "description": "Shared engineering foundation", "source": "./plugin" }
   ]
 }
 ```
@@ -306,7 +310,7 @@ A consuming repo's `.github/copilot/settings.json`:
   "extraKnownMarketplaces": {
     "dev-foundation": { "source": { "source": "github", "repo": "damgyeah/dev-foundation" } }
   },
-  "enabledPlugins": { "dev-foundation@dev-foundation": true }
+  "enabledPlugins": { "foundation@dev-foundation": true }
 }
 ```
 
@@ -316,14 +320,14 @@ is not plugin content belongs outside `plugin/`.
 
 Things to know when writing the plugin:
 
-- Slash commands are `/<plugin>:<skill name>`, e.g. `/dev-foundation:poteto-mode`. A
-  `name:` with spaces becomes hyphens with case kept (pstack's `Poteto Mode` →
-  `/pstack:Poteto-Mode`), so use kebab-case names.
+- Slash commands are `/<plugin>:<skill name>`, e.g. `/foundation:architect`. A
+  `name:` with spaces becomes hyphens with case kept (pstack's `Make Bot UI` →
+  /`pstack:Make-Bot-UI`), so use kebab-case names.
 - Skills are deduplicated by `name` with project and personal skills winning (CLI plugin
   reference, "Loading order and precedence"), so a plugin skill named like a repo skill is
   silently shadowed.
-- Agent IDs come from the file stem: `com.github.copilot/agents/poteto-agent.agent.md` →
-  `dev-foundation:poteto-agent`. pstack's `agents/*.md` (top-level, no `.agent.md`) load
+- Agent IDs come from the file stem: `com.github.copilot/agents/reviewer.agent.md` →
+  `foundation:reviewer`. pstack's `agents/*.md` (top-level, no `.agent.md`) load
   nowhere in Copilot.
 
 ## Q6 Plugin hooks
@@ -402,17 +406,17 @@ Plugin "pstack" installed successfully. Installed 54 skills.
 Warning: Direct plugin installs (repos, URLs, local paths) are deprecated. ...
 ```
 
-- **Loads:** all 54 `skills/*/SKILL.md`, as `/pstack:<name>` slash commands.
+- **Loads:** all 54 `skills/*/SKILL.md`, as /`pstack:<name>` slash commands.
 - **Model-visible:** only `setup-pstack`. The other 53 carry
   `disable-model-invocation: true`, so the model never sees or auto-invokes them (Q3);
-  a person must type `/pstack:poteto-mode` etc.
+  a person must type /`pstack:<name>`.
 - **Ignored, no warning:** `.cursor-plugin/plugin.json` (the root `plugin.json` with the
   Agent Plugins `$schema` wins, so `logo`, `category`, `tags`, `skills`, `agents` there have
-  no effect), top-level `agents/comment-sicko.md` and `agents/poteto-agent.md` (no custom
-  agents appeared), and `automations/benny/skills/` (not under `skills/`).
-- `poteto-agent.md` tells the agent to search `~/.cursor/plugins/` for the
-  `poteto-mode` skill; in Copilot the installed copy is under
-  `$COPILOT_HOME/installed-plugins/...`, so that instruction needs porting.
+  no effect), both top-level `agents/*.md` files (no custom agents appeared), and
+  `automations/benny/skills/` (not under `skills/`).
+- pstack's delegate agent tells itself to find its main skill under Cursor's plugin folder;
+  in Copilot the installed copy is under `$COPILOT_HOME/installed-plugins/...`, so that
+  instruction needs porting.
 
 ## Checking the app side
 
@@ -430,7 +434,7 @@ check the app, using the scratch repo left in place at `C:\Repos\foundation-scra
 3. Ask: "list your plugin skills and custom agents, and quote any MDC-CANARY or
    HOOK-CANARY in your context". Expect `probe-alpha`, `probe-gamma`,
    `compat-plugin:probe-agent`, `MDC-CANARY-2931` and `HOOK-CANARY-6021`.
-4. Run `/compat-plugin:probe-beta hi`; expect `BETA-CANARY-3392 [hi]`.
+4. Run /`compat-plugin:probe-beta hi`; expect `BETA-CANARY-3392 [hi]`.
 
 Anything missing there is an app gap to design around, not a plugin layout problem.
 
