@@ -19,9 +19,18 @@ FROM turns WHERE session_id = '<id>' ORDER BY turn_index
 
 If the cloud store has no rows yet, run the same query with `source: "local"`. If neither has the session, write a tight digest of the session yourself and pass that instead.
 
+Messages alone do not show which skills and tools ran. Tool records are in the cloud store:
+
+```sql
+SELECT name, arguments_json
+FROM tool_requests WHERE session_id = '<id>'
+```
+
+If that returns nothing, add a short digest of the skills you invoked, the skill files you read, and the commands that mattered. Tell the reviewers that missing tool evidence means unknown, not unused.
+
 ## 2. Spawn three reviewers in one turn
 
-Use the `task` tool, `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, `mode: "background"`. Reviewers read and query. They never edit.
+Use the `task` tool, `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, `mode: "background"`. Reviewers read and query. They never edit. Give each subagent the absolute path of its prompt file under this skill's folder (the folder of this SKILL.md), plus the values for its placeholders, and tell it to read that file first. Links inside a prompt file resolve relative to it.
 
 | Lens | Prompt |
 |---|---|
@@ -42,6 +51,8 @@ Move to Backlog any Accepted item that a lint, script, metadata flag, or runtime
 ## 5. Apply after approval
 
 Present the full Accepted, Rejected, and Backlog output and wait for the person to approve rows. Skill changes reach every future agent, so never apply them unapproved. Backlog items need no approval to be written down. File them where the repository tracks such work, or list them in the reply if it has no place for them.
+
+Skills that come from a plugin are read from its installed copy. Never edit that copy, since the next plugin update replaces it. Edit the plugin's source repository on a branch and open a pull request under that repository's rules (for foundation skills, damgyeah/dev-foundation). If no checkout is at hand, put the proposed patch in the reply instead. Skills in the current repository (`.github/skills/`) are edited in place.
 
 Apply each approved row as routed:
 

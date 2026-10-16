@@ -22,7 +22,7 @@ Write the intent in one paragraph from the person's message, the commit messages
 
 ## 3. Spawn both reviewers in one turn
 
-- **Reviewer A.** The `task` tool with `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, `mode: "background"`. Its prompt is [the reviewer prompt](references/reviewer-prompt.md) filled in with the intent, the diff or files, [the rubric](references/rubric.md), and [the code-quality lens](references/code-quality-review.md). It reads and reports. It does not edit.
+- **Reviewer A.** The `task` tool with `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, `mode: "background"`. Its prompt is [the reviewer prompt](references/reviewer-prompt.md) filled in with the intent, the diff or files, [the rubric](references/rubric.md), and [the code-quality lens](references/code-quality-review.md). It reads and reports. It does not edit. Pass the four files by absolute path (they sit under this skill's folder) and tell it to read them first.
 - **Reviewer B.** The `task` tool with `agent_type: "code-review"`, `mode: "background"`, and no `model`, so the user's setup decides it. Give it the intent, the base and head refs or the file list, and ask for high-confidence bugs, logic errors, and security issues.
 
 ## 4. Merge

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Answer "how does X work?" at the level a senior engineer needs to start working in the area: a working mental model, not annotated source.
 
-Spawn every subagent with the `task` tool, `agent_type: "explore"` for explorers and `agent_type: "general-purpose"` for the explainer, `model: "claude-opus-5.5"`. Explorers and the explainer only read. Run independent spawns in one turn with `mode: "background"`.
+Spawn every subagent with the `task` tool, `agent_type: "explore"` for explorers and `agent_type: "general-purpose"` for the explainer, `model: "claude-opus-5.5"`. Explorers and the explainer only read. Run independent spawns in one turn with `mode: "background"`. Give each subagent the absolute path of its prompt file under this skill's folder (the folder of this SKILL.md), plus the values for its placeholders, and tell it to read that file first. Links inside a prompt file resolve relative to it.
 
 ## 1. Size the question
 

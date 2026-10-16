@@ -16,7 +16,7 @@ Examples of the pattern:
 - User describes a flaky test the agent could have queried via an observability MCP. Routing: the debugging skill should mention the observability MCP.
 - User links a chat thread the agent could have fetched via a chat MCP. Routing: the relevant skill should mention the chat MCP.
 
-Read this session's transcript with the `session_store_sql` tool, only for session id <SESSION_ID>: `SELECT turn_index, user_message, assistant_response FROM turns WHERE session_id = '<SESSION_ID>' ORDER BY turn_index`. If it returns no rows, retry with `source: "local"`. If no id is given, use the digest below. Never query other sessions.
+Read this session's transcript with the `session_store_sql` tool, only for session id <SESSION_ID>: `SELECT turn_index, user_message, assistant_response FROM turns WHERE session_id = '<SESSION_ID>' ORDER BY turn_index`. If it returns no rows, retry with `source: "local"`. For the tools that ran, also query `SELECT name, arguments_json FROM tool_requests WHERE session_id = '<SESSION_ID>'`. If no id is given, use the digest below. Treat missing tool evidence as unknown, not as proof a skill went unused. Never query other sessions.
 
 Scan for:
 - Tool invocations and command flags the agent had to discover

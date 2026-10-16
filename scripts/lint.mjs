@@ -71,6 +71,7 @@ export function parseFrontmatter(text) {
     const m = /^([A-Za-z0-9_-]+):\s*(.*)$/.exec(lines[i]);
     if (!m) continue;
     let value = m[2].trim();
+    if (!/^['"]/.test(value)) value = value.replace(/\s+#.*$/, '');
     if (value === '' || /^[>|][+-]?$/.test(value)) {
       const block = [];
       while (i + 1 < end && /^(\s|$)/.test(lines[i + 1])) block.push(lines[++i].trim());

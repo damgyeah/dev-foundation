@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Find the forces that gave code its shape. [how](../how/SKILL.md) answers what the code does. This skill answers why.
 
-Spawn every subagent with the `task` tool, `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, independent spawns in one turn with `mode: "background"`. Investigators and the synthesizer read and query. They never write files, comment, or change external state.
+Spawn every subagent with the `task` tool, `agent_type: "general-purpose"`, `model: "claude-opus-5.5"`, independent spawns in one turn with `mode: "background"`. Investigators and the synthesizer read and query. They never write files, comment, or change external state. Give each subagent the absolute path of its prompt file under this skill's folder (the folder of this SKILL.md), plus the values for its placeholders, and tell it to read that file first. Links inside a prompt file resolve relative to it.
 
 Work as a careful, cautious, precise investigator. Keep what you know apart from what you infer. [The epistemics guide](references/epistemics.md) is the confidence framework, and the synthesizer must follow it.
 

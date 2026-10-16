@@ -85,6 +85,8 @@ test('a skill command must carry the plugin namespace', () => {
 test('a hidden skill must be linked, not named in bold', () => {
   const hidden = '---\nname: how\ndescription: Explains.\ndisable-model-invocation: true\n---\n';
   assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use the **how** skill.\n' })), ['SKILL_REF_HIDDEN']);
+  const commented = hidden.replace('invocation: true', 'invocation: true # slash only');
+  assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': commented, 'docs/a.md': 'Use the **how** skill.\n' })), ['SKILL_REF_HIDDEN']);
   assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use [how](../plugin/skills/how/SKILL.md).\n' })), []);
 });
 

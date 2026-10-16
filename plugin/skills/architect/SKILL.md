@@ -20,7 +20,7 @@ Skip Phase A only for true greenfield work with no surrounding system.
 
 Design it twice. Produce at least two structurally distinct candidates, whole shapes rather than point variations inside one shape, even when the first looks good enough. This is [principle-exhaust-the-design-space](../principle-exhaust-the-design-space/SKILL.md) made concrete.
 
-Write each candidate yourself, or spawn one `general-purpose` subagent per candidate (`model: "claude-opus-5.5"`, `mode: "background"`, each in its own scratch directory or worktree) with [the sketch prompt](references/sketch-prompt.md), the Phase A grounding, and a different starting constraint, so the candidates do not converge.
+Write each candidate yourself, or spawn one `general-purpose` subagent per candidate (`model: "claude-opus-5.5"`, `mode: "background"`, each in its own scratch directory or worktree) with the absolute path of [the sketch prompt](references/sketch-prompt.md) (links inside it resolve relative to it), the Phase A grounding, and a different starting constraint, so the candidates do not converge.
 
 Screen every candidate against [the design red flags](references/design-red-flags.md). Assume the next contributor is an agent that sees only the files it opened, copies the nearest example, and takes the shortest path that compiles. Prefer the shape where a change that looks right from one file is right for the whole repo.
 
