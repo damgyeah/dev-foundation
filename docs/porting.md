@@ -30,6 +30,7 @@ This is the one page, besides provenance, that may name the upstream's Cursor-sp
 
 - Router: `poteto-mode` became `foundation-mode`, rewritten to under 10 KB.
 - Playbooks: investigation, bug-fix, feature, refactoring, prototype, opening-a-pr, session-pickup, pause-safely. Bug fix now runs the regression check red before implementing, and commits the test and the fix together.
+- multi-phase-plan (v0.3.0). The plan stays a checklist with one owner and one verifiable unit per PR, and unit, live and perf evidence boxes, each allowed `n/a` with a reason. The ten swarm lanes on a Grok model became live boxes run through the repository's live-testing skill. `check-plan.mjs` stayed upstream: it validates that ten-lane template, so step 7 checks the plan inline. The execution playbooks it names (autopilot-full, autopilot-stack, orchestrate) are deferred, so a "Run the program" section carries what a coordinator needs: a lean state note, background workers in their own worktrees each given a brief file, and an audit by side effects. A nested session is created without a kickoff prompt and sent its brief by `send_session_message`, because kickoff prompts were lost when creation timed out (2026-10-16). Origin, Bugbot, the hourly /loop tick, Bun and the review video are gone.
 - Skills: how, why (only the source-control playbook is kept; other sources available in the session still get a generic investigator), architect, interrogate (with its rubric, lead judgment, and code-quality lens), blast-radius, tdd, correct, reflect, unslop, technical-writing, no-comments, benchmark-checklist, show-me-your-work.
 - All 24 `principle-*` skills. Six whose upstream bodies were cut to a line or two were rewritten from the router's summaries.
 
@@ -37,7 +38,7 @@ This is the one page, besides provenance, that may name the upstream's Cursor-sp
 
 Listed so a later version can pick them up. Each has its reason in provenance.
 
-- Playbooks: orchestrate, autopilot-full, autopilot-stack, shipping, babysit, multi-phase-plan, autonomous-run, hillclimb, perf-issue, runtime-forensics, trace-forensics, visual-parity, eval, worktree-cleanup, authoring-a-skill (replaced by inline rules).
+- Playbooks: orchestrate, autopilot-full, autopilot-stack, shipping, babysit, autonomous-run, hillclimb, perf-issue, runtime-forensics, trace-forensics, visual-parity, eval, worktree-cleanup, authoring-a-skill (replaced by inline rules).
 - Skills: arena, swarm, setup-pstack, make-bot-ui, automate-me, recall, ketchup, teach, sharpen, bro, in-your-own-words, figure-it-out, create-verification-skill, maintain-verification-skill, typescript-best-practices, poteto-help.
 - The benny automation.
 - Every script: the Bun and TypeScript tooling under `poteto-mode/scripts/` and `show-me-your-work/scripts/log.sh`. No Bun.

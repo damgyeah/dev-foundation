@@ -10,7 +10,7 @@ Our shared engineering foundation for coding agents, in two parts:
 In a pull request, from the repository root:
 
 ```sh
-npx --yes github:damgyeah/dev-foundation#v0.2.0 sync
+npx --yes github:damgyeah/dev-foundation#v0.3.0 sync
 ```
 
 `sync` writes the core between `<!-- foundation:core … begin -->` and `<!-- foundation:core end -->` markers in `AGENTS.md`, creating the file or appending the block if needed. Every byte outside the markers stays as it was, line endings included. Then add `.github/workflows/foundation.yml`:
@@ -20,8 +20,8 @@ name: foundation
 on: pull_request
 jobs:
   core:
-    uses: damgyeah/dev-foundation/.github/workflows/core-check.yml@v0.2.0
-    with: { ref: v0.2.0 }
+    uses: damgyeah/dev-foundation/.github/workflows/core-check.yml@v0.3.0
+    with: { ref: v0.3.0 }
 ```
 
 Write the same tag in both places. Release tags here are immutable, so a tag pin cannot move under you.
