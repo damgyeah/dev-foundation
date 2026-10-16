@@ -40,6 +40,7 @@ createInterface({ input: child.stdout }).on("line", (line) => {
   if (m.method) { console.log("REQ/NOTE", m.method, JSON.stringify(m.params ?? {}).slice(0, 300)); if (m.id !== undefined) send({ id: m.id, result: {} }); }
 });
 
+let status = 1;
 try {
   const init = await call("initialize", { protocolVersion: 1, clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false } });
   console.log("AGENT:", JSON.stringify(init.agentInfo ?? {}));
@@ -51,5 +52,6 @@ try {
     const res = await call("session/prompt", { sessionId, prompt: [{ type: "text", text: prompt }] });
     console.log(`<<< (${res.stopReason})\n${text}`);
   }
+  status = 0;
 } catch (e) { console.log("ERROR", JSON.stringify(e)); }
-clearTimeout(kill); child.kill(); process.exit(0);
+clearTimeout(kill); child.kill(); process.exit(status);
