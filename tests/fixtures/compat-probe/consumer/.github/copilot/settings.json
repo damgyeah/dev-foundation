@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "compat-market": {
+      "source": { "source": "directory", "path": "C:\\Repos\\foundation-scratch" }
+    }
+  },
+  "enabledPlugins": {
+    "compat-plugin@compat-market": true
+  }
+}

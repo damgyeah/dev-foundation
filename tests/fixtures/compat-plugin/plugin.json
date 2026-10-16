@@ -1,0 +1,7 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "compat-plugin",
+  "version": "0.0.1",
+  "description": "Synthetic probe plugin for Copilot CLI Agent Plugins 1.0 compatibility.",
+  "license": "MIT"
+}
