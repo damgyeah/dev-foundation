@@ -82,6 +82,16 @@ test('a skill command must carry the plugin namespace', () => {
   assert.deepEqual(codes(tree({ ...files, 'docs/a.md': 'Run `/foundation:how`.\n' })), []);
 });
 
+test('a plugin agent needs a name matching its file and a description, and references to it must resolve', () => {
+  const agent = (name, description = 'Delegate.') => `---\nname: ${name}\ndescription: ${description}\n---\n`;
+  const base = { 'plugin/plugin.json': '{ "name": "foundation" }' };
+  const dir = 'plugin/com.github.copilot/agents/';
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'docs/a.md': 'Spawn `agent_type: "foundation:helper"`.\n' })), []);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('Helper') })), ['AGENT_NAME_MISMATCH']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper', '') })), ['AGENT_DESCRIPTION_MISSING']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'docs/a.md': '`agent_type: "foundation:other"`\n' })), ['AGENT_REF_UNKNOWN']);
+});
+
 test('a hidden skill must be linked, not named in bold', () => {
   const hidden = '---\nname: how\ndescription: Explains.\ndisable-model-invocation: true\n---\n';
   assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use the **how** skill.\n' })), ['SKILL_REF_HIDDEN']);

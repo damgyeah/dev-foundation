@@ -41,6 +41,7 @@ const BUILTIN_COMMANDS = new Set([
 const STATUSES = new Set(['ported', 'adapted', 'deferred', 'dropped']);
 const MAX_DESCRIPTION = 1024;
 const SKILL_FILE = /(?:^|\/)skills\/([^/]+)\/SKILL\.md$/;
+const AGENT_FILE = /(?:^|\/)com\.github\.copilot\/agents\/([^/]+)\.agent\.md$/;
 
 function toPosix(p) {
   return p.split(sep).join('/');
@@ -145,6 +146,7 @@ export function lint(root) {
   }
   const manifest = join(root, 'plugin', 'plugin.json');
   const plugin = existsSync(manifest) ? JSON.parse(readFileSync(manifest, 'utf8')).name : undefined;
+  const agents = new Set(files.map((f) => AGENT_FILE.exec(f)?.[1]).filter(Boolean));
 
   for (const file of files) {
     const text = readFileSync(join(root, file), 'utf8');
@@ -176,8 +178,21 @@ export function lint(root) {
       }
     }
 
+    const agentStem = AGENT_FILE.exec(file)?.[1];
+    if (agentStem) {
+      const fm = parseFrontmatter(text);
+      if (fm?.name !== agentStem) {
+        fail('AGENT_NAME_MISMATCH', file, 1, `name "${fm?.name ?? ''}" does not equal the file stem "${agentStem}"`);
+      }
+      if (!fm?.description) fail('AGENT_DESCRIPTION_MISSING', file, 1, 'description is empty');
+    }
+
     if (!file.endsWith('.md')) continue;
     proseLines(text).forEach((line, i) => {
+      // Plugin agents load as `<plugin>:<file stem>`.
+      for (const m of line.matchAll(/agent_type: "([a-z0-9-]+):([a-z0-9-]+)"/g)) {
+        if (m[1] !== plugin || !agents.has(m[2])) fail('AGENT_REF_UNKNOWN', file, i + 1, `agent "${m[1]}:${m[2]}" does not exist`);
+      }
       for (const target of linkTargets(line)) {
         if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('#')) continue;
         const path = decodeURIComponent(target.split(/[#?]/)[0]);
