@@ -82,6 +82,18 @@ test('a skill command must carry the plugin namespace', () => {
   assert.deepEqual(codes(tree({ ...files, 'docs/a.md': 'Run `/foundation:how`.\n' })), []);
 });
 
+test('a plugin agent needs a name matching its file and a description, and references to it must resolve', () => {
+  const agent = (name, description = 'Delegate.') => `---\nname: ${name}\ndescription: ${description}\n---\n`;
+  const base = { 'plugin/plugin.json': '{ "name": "foundation" }' };
+  const dir = 'plugin/com.github.copilot/agents/';
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'docs/a.md': 'Spawn `agent_type: "foundation:helper"`.\n' })), []);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('Helper') })), ['AGENT_NAME_MISMATCH']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper', '') })), ['AGENT_DESCRIPTION_MISSING']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'docs/a.md': '`agent_type: "foundation:other"`\n' })), ['AGENT_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'plugin/skills/x.md': 'Delegate to a `foundation:other` subagent.\n' })), ['AGENT_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...base, [`${dir}helper.agent.md`]: agent('helper'), 'plugin/skills/x.md': 'Delegate to a `foundation:helper` subagent, see `http:x`.\n', 'docs/b.md': 'For example `foundation:reviewer`.\n' })), []);
+});
+
 test('a hidden skill must be linked, not named in bold', () => {
   const hidden = '---\nname: how\ndescription: Explains.\ndisable-model-invocation: true\n---\n';
   assert.deepEqual(codes(tree({ 'plugin/skills/how/SKILL.md': hidden, 'docs/a.md': 'Use the **how** skill.\n' })), ['SKILL_REF_HIDDEN']);
@@ -145,4 +157,48 @@ test('provenance entries must be complete and point at real targets', () => {
 test('fixtures and scratch directories are not linted', () => {
   const root = tree({ 'tests/fixtures/x/skills/a/SKILL.md': '# grok\n', '.tmp/b.md': '[x](nope.md)\n' });
   assert.deepEqual(lint(root), []);
+});
+
+test('an agent outside the plugin folder does not satisfy a reference', () => {
+  const agent = '---\nname: helper\ndescription: Delegate.\n---\n';
+  const root = tree({
+    'plugin/plugin.json': '{ "name": "foundation" }',
+    'com.github.copilot/agents/helper.agent.md': agent,
+    'docs/a.md': '`agent_type: "foundation:helper"`\n',
+  });
+  assert.deepEqual(codes(root), ['AGENT_REF_UNKNOWN']);
+});
+
+test('frontmatter keys Copilot does not read fail, and a skill nothing can invoke fails', () => {
+  assert.deepEqual(codes(tree({ 'plugin/skills/a/SKILL.md': '---\nname: a\ndescription: A.\nicon: crown\n---\n' })), ['SKILL_FRONTMATTER_KEY_UNKNOWN']);
+  assert.deepEqual(codes(tree({ 'plugin/skills/a/SKILL.md': '---\nname: a\ndescription: A.\nuser-invocable: false\n---\n' })), []);
+  const both = '---\nname: a\ndescription: A.\ndisable-model-invocation: true\nuser-invocable: false\n---\n';
+  assert.deepEqual(codes(tree({ 'plugin/skills/a/SKILL.md': both })), ['SKILL_UNREACHABLE']);
+  const agent = '---\nname: h\ndescription: D.\nis_background: true\n---\n';
+  assert.deepEqual(codes(tree({ 'plugin/com.github.copilot/agents/h.agent.md': agent })), ['AGENT_FRONTMATTER_KEY_UNKNOWN']);
+});
+
+test('a rule must be an always-applied .mdc within budget that names real skills', () => {
+  const dir = 'plugin/com.github.copilot/rules/';
+  const skills = { 'plugin/skills/how/SKILL.md': skill('how') };
+  const rule = (fm, body = 'Load `how` first.\n') => `---\n${fm}\n---\n${body}`;
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true') })), []);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.md`]: rule('description: Core.\nalwaysApply: true') })), ['RULE_NOT_MDC']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('alwaysApply: true') })), ['RULE_DESCRIPTION_MISSING']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: false') })), ['RULE_NOT_ALWAYS_APPLY']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true\napplyTo: "**"') })), ['RULE_FRONTMATTER_KEY_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'x'.repeat(2100)) })), ['RULE_TOO_LARGE']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Load the `who` skill first.\n') })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Skills: `why` (motivation).\n') })), ['SKILL_REF_UNKNOWN']);
+  assert.deepEqual(codes(tree({ ...skills, [`${dir}core.mdc`]: rule('description: Core.\nalwaysApply: true', 'Spawn with the `task` tool. Use `how` (code).\n') })), []);
+});
+
+test('marketplace entries must point at a plugin of the same name', () => {
+  const market = (plugins) => JSON.stringify({ name: 'dev-foundation', plugins });
+  const base = { 'plugin/plugin.json': '{ "name": "foundation" }' };
+  const at = '.github/plugin/marketplace.json';
+  assert.deepEqual(codes(tree({ ...base, [at]: market([{ name: 'foundation', source: './plugin' }]) })), []);
+  assert.deepEqual(codes(tree({ ...base, [at]: market([{ name: 'foundation', source: './plugins' }]) })), ['MARKETPLACE_SOURCE_MISSING']);
+  assert.deepEqual(codes(tree({ ...base, [at]: market([{ name: 'other', source: './plugin' }]) })), ['MARKETPLACE_NAME_MISMATCH']);
+  assert.deepEqual(codes(tree({ ...base, [at]: '{' })), ['MARKETPLACE_INVALID']);
 });

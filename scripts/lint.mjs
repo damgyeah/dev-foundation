@@ -41,6 +41,18 @@ const BUILTIN_COMMANDS = new Set([
 const STATUSES = new Set(['ported', 'adapted', 'deferred', 'dropped']);
 const MAX_DESCRIPTION = 1024;
 const SKILL_FILE = /(?:^|\/)skills\/([^/]+)\/SKILL\.md$/;
+const AGENT_FILE = /^plugin\/com\.github\.copilot\/agents\/([^/]+)\.agent\.md$/;
+const RULE_DIR = 'plugin/com.github.copilot/rules/';
+// An always-on rule lands in the system prompt every turn, so it has a budget.
+const MAX_RULE_BYTES = 2048;
+const MARKETPLACE = '.github/plugin/marketplace.json';
+
+// Frontmatter keys Copilot CLI 1.0.98 reads (docs/copilot-compat.md Q2, Q3, Q7).
+const KEYS = {
+  skill: new Set(['name', 'description', 'license', 'argument-hint', 'disable-model-invocation', 'user-invocable', 'allowed-tools']),
+  agent: new Set(['name', 'description', 'model', 'tools']),
+  rule: new Set(['description', 'alwaysApply', 'globs']),
+};
 
 function toPosix(p) {
   return p.split(sep).join('/');
@@ -145,6 +157,7 @@ export function lint(root) {
   }
   const manifest = join(root, 'plugin', 'plugin.json');
   const plugin = existsSync(manifest) ? JSON.parse(readFileSync(manifest, 'utf8')).name : undefined;
+  const agents = new Set(files.map((f) => AGENT_FILE.exec(f)?.[1]).filter(Boolean));
 
   for (const file of files) {
     const text = readFileSync(join(root, file), 'utf8');
@@ -165,6 +178,7 @@ export function lint(root) {
       if (!fm) {
         fail('SKILL_FRONTMATTER_MISSING', file, 1, 'SKILL.md has no frontmatter');
       } else {
+        checkKeys(fm, KEYS.skill, 'SKILL_FRONTMATTER_KEY_UNKNOWN', file, fail);
         if (fm.name !== skillDir) {
           fail('SKILL_NAME_MISMATCH', file, 1, `name "${fm.name ?? ''}" does not equal directory "${skillDir}"`);
         }
@@ -173,11 +187,32 @@ export function lint(root) {
         } else if (fm.description.length > MAX_DESCRIPTION) {
           fail('SKILL_DESCRIPTION_TOO_LONG', file, 1, `description is ${fm.description.length} chars, max ${MAX_DESCRIPTION}`);
         }
+        if (fm['disable-model-invocation'] === 'true' && fm['user-invocable'] === 'false') {
+          fail('SKILL_UNREACHABLE', file, 1, 'hidden from the model and from slash commands; nothing can invoke it');
+        }
       }
     }
 
+    const agentStem = AGENT_FILE.exec(file)?.[1];
+    if (agentStem) {
+      const fm = parseFrontmatter(text) ?? {};
+      checkKeys(fm, KEYS.agent, 'AGENT_FRONTMATTER_KEY_UNKNOWN', file, fail);
+      if (fm.name !== agentStem) {
+        fail('AGENT_NAME_MISMATCH', file, 1, `name "${fm.name ?? ''}" does not equal the file stem "${agentStem}"`);
+      }
+      if (!fm.description) fail('AGENT_DESCRIPTION_MISSING', file, 1, 'description is empty');
+    }
+
+    if (file.startsWith(RULE_DIR)) lintRule(file, text, skills, fail);
+
     if (!file.endsWith('.md')) continue;
     proseLines(text).forEach((line, i) => {
+      // Plugin agents load as `<plugin>:<file stem>`.
+      const agentRefs = [...line.matchAll(/agent_type: "([a-z0-9-]+):([a-z0-9-]+)"/g), ...line.matchAll(/`([a-z0-9-]+):([a-z0-9-]+)`/g)];
+      for (const m of agentRefs) {
+        if (m[0].startsWith('`') && (m[1] !== plugin || !file.startsWith('plugin/'))) continue;
+        if (m[1] !== plugin || !agents.has(m[2])) fail('AGENT_REF_UNKNOWN', file, i + 1, `agent "${m[1]}:${m[2]}" does not exist`);
+      }
       for (const target of linkTargets(line)) {
         if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('#')) continue;
         const path = decodeURIComponent(target.split(/[#?]/)[0]);
@@ -193,7 +228,55 @@ export function lint(root) {
   }
 
   for (const file of files.filter((f) => /^provenance\/[^/]+\.json$/.test(f))) lintProvenance(root, file, fail);
+  if (files.includes(MARKETPLACE)) lintMarketplace(root, fail);
   return failures;
+}
+
+function checkKeys(fm, allowed, code, file, fail) {
+  for (const key of Object.keys(fm)) if (!allowed.has(key)) fail(code, file, 1, `frontmatter key "${key}" is not read by Copilot`);
+}
+
+// Only `.mdc` files load from the rules folder (docs/copilot-compat.md Q7).
+function lintRule(file, text, skills, fail) {
+  if (!file.endsWith('.mdc')) {
+    fail('RULE_NOT_MDC', file, 1, 'only .mdc files load as rules; this file is ignored');
+    return;
+  }
+  const fm = parseFrontmatter(text) ?? {};
+  checkKeys(fm, KEYS.rule, 'RULE_FRONTMATTER_KEY_UNKNOWN', file, fail);
+  if (!fm.description) fail('RULE_DESCRIPTION_MISSING', file, 1, 'description is required');
+  if (fm.alwaysApply !== 'true') fail('RULE_NOT_ALWAYS_APPLY', file, 1, 'alwaysApply must be true');
+  const bytes = Buffer.byteLength(text);
+  if (bytes > MAX_RULE_BYTES) fail('RULE_TOO_LARGE', file, 1, `${bytes} bytes, budget ${MAX_RULE_BYTES}`);
+  // A skill reference in a rule is a backticked name followed by " skill" or a parenthesized trigger.
+  text.split(/\r?\n/).forEach((line, i) => {
+    for (const m of line.matchAll(/`([a-z][a-z0-9]*(?:-[a-z0-9]+)*)`(?= skill\b| \()/g)) {
+      if (!skills.has(m[1])) fail('SKILL_REF_UNKNOWN', file, i + 1, `skill "${m[1]}" does not exist`);
+    }
+  });
+}
+
+function lintMarketplace(root, fail) {
+  let doc;
+  try {
+    doc = JSON.parse(readFileSync(join(root, MARKETPLACE), 'utf8'));
+  } catch (err) {
+    fail('MARKETPLACE_INVALID', MARKETPLACE, 1, `not valid JSON: ${err.message}`);
+    return;
+  }
+  if (!doc.name || !Array.isArray(doc.plugins)) {
+    fail('MARKETPLACE_INVALID', MARKETPLACE, 1, 'needs a name and a plugins array');
+    return;
+  }
+  for (const entry of doc.plugins) {
+    const manifest = typeof entry.source === 'string' ? join(root, entry.source, 'plugin.json') : null;
+    if (!manifest || !existsSync(manifest)) {
+      fail('MARKETPLACE_SOURCE_MISSING', MARKETPLACE, 1, `plugin "${entry.name}" source "${entry.source}" has no plugin.json`);
+      continue;
+    }
+    const name = JSON.parse(readFileSync(manifest, 'utf8')).name;
+    if (name !== entry.name) fail('MARKETPLACE_NAME_MISMATCH', MARKETPLACE, 1, `entry "${entry.name}" points at plugin "${name}"`);
+  }
 }
 
 function lintProvenance(root, file, fail) {

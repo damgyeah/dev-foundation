@@ -1,7 +1,6 @@
 ---
 name: why
 description: "Explain why code is shaped the way it is: design rationale, tradeoffs, regressions, data-backed thresholds. Searches git history, GitHub pull requests and issues, and any other evidence source available in the session in parallel, then returns a cited, confidence-tiered answer. Use how for runtime behavior."
-disable-model-invocation: true
 ---
 
 # Why

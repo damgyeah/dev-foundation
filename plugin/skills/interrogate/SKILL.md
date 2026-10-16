@@ -1,7 +1,6 @@
 ---
 name: interrogate
 description: "Adversarial review of a change from two independent reviewers, an Opus reviewer with the full rubric and the code-review agent, judged into act on, consider, noted, and dismissed. Use for 'interrogate', 'adversarial review', 'challenge this', 'stress test this code', 'find blind spots', or a contested design before it ships."
-disable-model-invocation: true
 ---
 
 # Interrogate
