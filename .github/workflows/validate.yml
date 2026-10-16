@@ -19,3 +19,9 @@ jobs:
         with:
           node-version: 24
       - run: npm test
+
+  # Runs the reusable check against this repository's own AGENTS.md, at this commit's tool.
+  core-check:
+    uses: ./.github/workflows/core-check.yml
+    with:
+      ref: ${{ github.sha }}
