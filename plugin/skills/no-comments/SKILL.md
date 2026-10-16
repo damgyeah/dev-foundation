@@ -1,7 +1,6 @@
 ---
 name: no-comments
 description: "Before review, strip comments that narrate or excuse code, act on the flagged code, and offer structural encodings for constraint comments. Use for 'remove the comments', 'no comments', or the pre-review pass in foundation playbooks."
-disable-model-invocation: true
 ---
 
 # No comments

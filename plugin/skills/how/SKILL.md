@@ -1,7 +1,6 @@
 ---
 name: how
 description: "Explain how code works: subsystem architecture, runtime flow, where things live, and placement or ownership questions (\"where should this live\", \"is this the right layer\"). Use before changing unfamiliar code. Use why for motivation."
-disable-model-invocation: true
 ---
 
 # How

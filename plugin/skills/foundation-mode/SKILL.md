@@ -1,11 +1,11 @@
 ---
 name: foundation-mode
-description: "Engineering workflow for nontrivial work in a repository: route the task to a playbook (investigation, bug fix, feature, refactoring, prototype, opening a PR, session pickup, pause safely), apply the principles that shape each decision, delegate to subagents, and prove the result before reporting. Use when asked to work in foundation mode, when the repository's AGENTS.md says to use foundation, or for /foundation:foundation-mode."
+description: "Engineering workflow for nontrivial work in a repository: route the task to a playbook (investigation, bug fix, feature, refactoring, prototype, opening a PR, session pickup, pause safely), apply the principles that shape each decision, delegate to subagents, and prove the result before reporting. Use it first for any nontrivial task (a bug, a feature, a refactor, a design or how-and-why question, picking up or pausing work), when asked for foundation mode, or for /foundation:foundation-mode."
 ---
 
 # Foundation mode
 
-Every other foundation skill and playbook is a file next to this one. Follow the links. Do not look them up as skills, since they are hidden from the skill list.
+Every other foundation skill and playbook is a file next to this one. Follow the links: they work for every skill, including correct and reflect, which only a person can invoke by command.
 
 ## The repository's rules win
 

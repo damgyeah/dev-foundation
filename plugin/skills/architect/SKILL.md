@@ -1,7 +1,6 @@
 ---
 name: architect
 description: "Sketch types, signatures, and module boundaries before writing code, compare at least two candidate shapes, get a rubber-duck critique, then implement against the chosen sketch. Use for 'architect this', 'design this', or any code that crosses a function boundary where jumping to code would lock in the wrong shape."
-disable-model-invocation: true
 ---
 
 # Architect

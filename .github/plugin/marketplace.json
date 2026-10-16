@@ -1,0 +1,13 @@
+{
+  "name": "dev-foundation",
+  "owner": {
+    "name": "damgyeah"
+  },
+  "plugins": [
+    {
+      "name": "foundation",
+      "description": "Engineering workflows, playbooks and principles for GitHub Copilot",
+      "source": "./plugin"
+    }
+  ]
+}

@@ -695,19 +695,19 @@
     {
       "path": "skills/principle-attack-the-premise/SKILL.md",
       "sha256": "6a932884daad4aa189e9b5d1665226bbc75621d4d2a398fd4003bebd382f4599",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-attack-the-premise/SKILL.md"
     },
     {
       "path": "skills/principle-boundary-discipline/SKILL.md",
       "sha256": "62ac2862c2caa22dd14531f51c9c6bb445ceb198ca98a687e25b4d47c1f10a28",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-boundary-discipline/SKILL.md"
     },
     {
       "path": "skills/principle-build-the-lever/SKILL.md",
       "sha256": "3434b0ad0c640c6f1d7960be7a8986c3bcdc14e26060360dec29903df60074ff",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-build-the-lever/SKILL.md"
     },
     {
@@ -725,25 +725,25 @@
     {
       "path": "skills/principle-experience-first/SKILL.md",
       "sha256": "58903529d733b1c1a7c9ccf127d45ef3c7d0d9f0b81164a4dc6b80efe6f2912b",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-experience-first/SKILL.md"
     },
     {
       "path": "skills/principle-explain-the-number/SKILL.md",
       "sha256": "cd5a25f9e7cf023627ccb470dc5faa97542f29b4319496a32b839a8e1e988047",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-explain-the-number/SKILL.md"
     },
     {
       "path": "skills/principle-fix-root-causes/SKILL.md",
       "sha256": "8df3c8c3fe57eb0055a5c8efab8ab144557fdf301da70b1cdc77a3a3ef3f3052",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-fix-root-causes/SKILL.md"
     },
     {
       "path": "skills/principle-foundational-thinking/SKILL.md",
       "sha256": "864b827e8199d946ce58beca0f89c4ed4099ed6e426fb698a3aaa45de2a9eea2",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-foundational-thinking/SKILL.md"
     },
     {
@@ -761,7 +761,7 @@
     {
       "path": "skills/principle-make-operations-idempotent/SKILL.md",
       "sha256": "7aa9327cf1f1aa057e95d47a0a78bd88a8f9d556b608866fee939d455a53a019",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-make-operations-idempotent/SKILL.md"
     },
     {
@@ -773,13 +773,13 @@
     {
       "path": "skills/principle-minimize-reader-load/SKILL.md",
       "sha256": "1ea2b7fef2391cae5844c4efdbd59031f775e8a52d06b7495d707229a200dcca",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-minimize-reader-load/SKILL.md"
     },
     {
       "path": "skills/principle-model-the-domain/SKILL.md",
       "sha256": "52c0d85e0c3827c41c18299b642657d7b47eaf77b7b31609e42e0df42b84c75f",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-model-the-domain/SKILL.md"
     },
     {
@@ -791,7 +791,7 @@
     {
       "path": "skills/principle-outcome-oriented-execution/SKILL.md",
       "sha256": "10eb91633aa570355ba4bb37088fcade2b22e498df7a58edc749e65bc5a78e2d",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-outcome-oriented-execution/SKILL.md"
     },
     {
@@ -803,13 +803,13 @@
     {
       "path": "skills/principle-redesign-from-first-principles/SKILL.md",
       "sha256": "170e0a658783e43fee8ec5a8c2422a4abb8f69cef621dd1819a95910b8207034",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-redesign-from-first-principles/SKILL.md"
     },
     {
       "path": "skills/principle-separate-before-serializing-shared-state/SKILL.md",
       "sha256": "05294b40448e927c5da1c7b6f5c6b9fed3744637e3833d2d948b9154a9dd00bb",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-separate-before-serializing-shared-state/SKILL.md"
     },
     {
@@ -821,13 +821,13 @@
     {
       "path": "skills/principle-subtract-before-you-add/SKILL.md",
       "sha256": "8c93bb9d1a7f38e2ef37655d93f0e790fa59903105af3d500cc8a663ebe45f3f",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-subtract-before-you-add/SKILL.md"
     },
     {
       "path": "skills/principle-test-behavior-not-implementation/SKILL.md",
       "sha256": "f7223698623b6a26fea49c751e466b38e6691b1f32ce841d3983e7ffbe2b74a6",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/principle-test-behavior-not-implementation/SKILL.md"
     },
     {
@@ -941,7 +941,7 @@
     {
       "path": "skills/unslop/SKILL.md",
       "sha256": "ccab208e315ce05e2fab8eeee2f7879f1289b5c6844840b2d307adf31c79144f",
-      "status": "ported",
+      "status": "adapted",
       "target": "plugin/skills/unslop/SKILL.md"
     },
     {

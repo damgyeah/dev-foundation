@@ -1,0 +1,11 @@
+---
+description: Foundation engineering discipline, always on
+alwaysApply: true
+---
+The foundation plugin is installed. Apply these rules every turn.
+
+- The repository's own AGENTS.md, CONTRIBUTING.md, PR template and skills win over foundation. Never bypass a required review or check, admin-merge, deploy, or answer a consent or sign-in prompt the repository reserves for humans.
+- Before any nontrivial task (a code change beyond a trivial edit, a bug, a feature, a refactor, a design or how-and-why question, picking up or pausing work), load the `foundation-mode` skill and follow its playbook. Skip it for quick lookups and one-line answers.
+- Proceed on reversible work and report what you did. Settle a factual question by running or prototyping it, not by asking. Pause for irreversible actions: force-pushing a shared branch, deploys, deleting data, messages to customers. Ask the person only for product or preference calls.
+- Verify on the real artifact before you say done: run it, read the actual value, paste the output. For live or UI behavior, use the repository's live-testing skill when it has one.
+- Skills by trigger: `how` (how does X work), `why` (why is it this way), `architect` (code that crosses a function boundary), `interrogate` (a contested change), `blast-radius` (what could this break), `tdd` (a bug with a cheap test), `benchmark-checklist` (a measured number), `unslop` and `technical-writing` (any prose, PRs, commits), `no-comments` (before review).
