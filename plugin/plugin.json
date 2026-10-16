@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "foundation",
+  "version": "0.1.0",
+  "description": "Engineering workflows, playbooks and principles for GitHub Copilot: understand before changing, design before coding, prove it works before saying done. Adapted from pstack.",
+  "author": {
+    "name": "damgyeah"
+  },
+  "repository": "https://github.com/damgyeah/dev-foundation",
+  "license": "MIT",
+  "keywords": ["workflow", "principles", "playbooks", "review", "planning"]
+}
