@@ -42,38 +42,20 @@ Use `--file <path>` for a file other than `AGENTS.md`.
 
 Adapted from [pstack](https://github.com/cursor/plugins/tree/main/pstack) (MIT, Lauren Tan) for the GitHub Copilot app and CLI running Claude Opus. [docs/porting.md](docs/porting.md) says what changed and why. [provenance/pstack.json](provenance/pstack.json) records every upstream file taken, from which commit.
 
-## Enable it in a repository
+## Install the plugin for yourself
 
-Add `.github/copilot/settings.json` to the repository:
+The plugin is optional. Install it at user level when you want depth:
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "dev-foundation": { "source": { "source": "github", "repo": "damgyeah/dev-foundation" } }
-  },
-  "enabledPlugins": { "foundation@dev-foundation": true }
-}
+```sh
+copilot plugin marketplace add damgyeah/dev-foundation
+copilot plugin install foundation@dev-foundation
 ```
 
-Then add one line to its `AGENTS.md`, so people and agents know it is there:
-
-```markdown
-Nontrivial work follows the `foundation-mode` skill from the foundation plugin. This file wins where they differ.
-```
-
-Three conditions apply, all measured in [docs/copilot-compat.md](docs/copilot-compat.md):
-
-- Copilot loads a repository-enabled plugin only in a trusted folder. Trust the folder when Copilot asks.
-- dev-foundation is private, so Copilot fetches it with `git clone`. Your `git` must already be able to clone it: Git Credential Manager does this, or run `gh auth setup-git`.
-- Each person opens one interactive `copilot` session in the repository first. That session installs the plugin. `copilot -p` and automation see it only after that.
-
-To install it for yourself instead, run `copilot plugin marketplace add damgyeah/dev-foundation`, then `copilot plugin install foundation@dev-foundation`.
+Do not enable it from a repository's `.github/copilot/settings.json`. Pilot 1 (2026-10-16) measured why: a repository enable loads nothing in a fresh environment's first session (a cloud agent, a CI runner, a new machine); a user install silently overrides the repository's pinned version, since both share one cache slot; and the always-on rule the plugin used to carry was ignored in 7 of 10 runs. What every repository needs is in the core instead.
 
 ## Use it
 
-You do not have to type anything. An always-on rule tells the model to load `foundation-mode` for any nontrivial task. foundation-mode picks a playbook and copies its steps into the todo list.
-
-To ask for it explicitly, run `/foundation:foundation-mode` followed by the task. Every skill except the principles has a command:
+Nothing loads on its own. Run `/foundation:foundation-mode` followed by the task, or another skill's command. Copilot may also load a skill whose description matches the task. Every skill except the principles has a command:
 
 | Command | Use it for |
 |---|---|
@@ -102,7 +84,6 @@ plugin/                         the plugin; the whole folder is copied on instal
   plugin.json
   skills/<name>/SKILL.md        foundation-mode and its playbooks, 13 skills, 24 principles
   com.github.copilot/agents/    foundation-agent, the delegate subagent
-  com.github.copilot/rules/     foundation.mdc, the always-on rule (2 KB budget)
 .github/plugin/marketplace.json the marketplace entry for the plugin
 docs/ provenance/ scripts/ tests/
 ```
